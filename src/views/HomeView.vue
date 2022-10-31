@@ -1,18 +1,21 @@
 <template>
-  <hello-world />
+  <h1>Home page</h1>
+  <p>Hello, {{ user?.username }}</p>
+  <button @click="logout">Logout</button>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useUserStore } from '@/stores/user';
+import { useRouter } from 'vue-router';
 
-// Components
-import HelloWorld from '../components/HelloWorld.vue';
+const Router = useRouter();
 
-export default defineComponent({
-  name: 'HomeView',
+const userStore = useUserStore();
+const user = computed(() => userStore.getUser);
 
-  components: {
-    HelloWorld,
-  },
-});
+const logout = () => {
+  userStore.logout();
+  Router.push({ name: 'login' });
+};
 </script>

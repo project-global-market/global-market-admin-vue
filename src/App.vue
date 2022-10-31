@@ -1,24 +1,42 @@
 <template>
-  <v-app>
-    <v-main>
-      <router-view />
-    </v-main>
+  <v-app v-if="appReady">
+    <router-view />
   </v-app>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useUserStore } from '@/stores/user';
+import { getAccessToken } from '@/api/tokens';
 
-const num = '5';
-console.log(num);
+const userStore = useUserStore();
+const appReady = ref<boolean>(false);
 
-export default defineComponent({
-  name: 'App',
+const authToken = getAccessToken();
 
-  data() {
-    return {
-      //
-    };
-  },
-});
+if (!authToken) {
+  appReady.value = true;
+}
+
+async function checkUserAuth() {
+  if (authToken) {
+    await userStore.checkAuth();
+    appReady.value = true;
+  }
+}
+
+checkUserAuth();
+
+// supabase.auth.onAuthStateChange(async (authEvent, session) => {
+//   Store.setDbUser(session);
+
+//   if (supabase.auth.user()) {
+//     await Store.loadUser();
+//     await ChatsListStore.loadChatsList();
+//     await MainChatStore.loadChatUsers();
+//     await MainChatStore.loadChatMessages();
+//   }
+
+//   appReady.value = true;
+// });
 </script>
